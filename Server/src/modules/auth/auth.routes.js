@@ -3,14 +3,15 @@ const authController = require("./auth.controller");
 const authMiddleware = require("../../middleware/auth.middleware");
 const roleMiddleware = require("../../middleware/role.middleware");
 const validate = require("../../middleware/validate.middleware");
+const { authLimiter } = require("../../middleware/rateLimit.middleware");
 const asyncHandler = require("../../utils/asyncHandler");
 const sendResponse = require("../../utils/sendResponse");
 const { registerSchema, loginSchema } = require("../../validation/auth.schemas");
 
 const router = express.Router();
 
-router.post("/register", validate(registerSchema), authController.register);
-router.post("/login", validate(loginSchema), authController.login);
+router.post("/register", authLimiter, validate(registerSchema), authController.register);
+router.post("/login", authLimiter, validate(loginSchema), authController.login);
 
 router.get(
   "/protected",

@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const requestLogger = require("./middleware/requestLogger.middleware");
 const errorMiddleware = require("./middleware/error.middleware");
+const { globalLimiter } = require("./middleware/rateLimit.middleware");
 const { createAppError } = require("./utils/appError");
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use(
     origin: env.CORS_ORIGIN || true,
   })
 );
+app.use(globalLimiter);
 app.use(express.json());
 app.use(requestLogger);
 app.use("/auth", authRoutes);

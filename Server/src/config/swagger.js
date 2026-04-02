@@ -12,6 +12,11 @@ const options = {
     servers: [
       {
         url: "http://localhost:5000",
+        description: "Local development",
+      },
+      {
+        url: "https://finance-data-processing-and-access-fmor.onrender.com",
+        description: "Production (Render)",
       },
     ],
     components: {

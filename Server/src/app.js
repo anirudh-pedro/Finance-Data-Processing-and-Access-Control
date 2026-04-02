@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const swaggerUi = require("swagger-ui-express");
 const requestLogger = require("./middleware/requestLogger.middleware");
 const errorMiddleware = require("./middleware/error.middleware");
 const { globalLimiter } = require("./middleware/rateLimit.middleware");
@@ -14,6 +15,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const financeRoutes = require("./modules/finance/finance.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 const userRoutes = require("./modules/user/user.routes");
+const swaggerSpec = require("./config/swagger");
 
 const app = express();
 const PORT = env.PORT;
@@ -30,6 +32,7 @@ app.use("/auth", authRoutes);
 app.use("/records", financeRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/users", userRoutes);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   return res.status(200).json({

@@ -79,6 +79,27 @@ async function updateUser(userId, payload, currentUser) {
     throw createAppError(400, "No valid fields provided for update", "VALIDATION_ERROR");
   }
 
+  const isAdminRoleRemoval = data.role !== undefined && data.role !== "ADMIN";
+  const isAdminDeactivation = data.status === false;
+  const isActiveAdminTarget = existingUser.role === "ADMIN" && existingUser.status === true;
+
+  if (isActiveAdminTarget && (isAdminRoleRemoval || isAdminDeactivation)) {
+    const activeAdminCount = await prisma.user.count({
+      where: {
+        role: "ADMIN",
+        status: true,
+      },
+    });
+
+    if (activeAdminCount === 1) {
+      throw createAppError(
+        400,
+        "Cannot remove the last active admin",
+        "LAST_ADMIN_PROTECTION"
+      );
+    }
+  }
+
   if (currentUser.userId === userId) {
     if (data.role && data.role !== "ADMIN") {
       throw createAppError(

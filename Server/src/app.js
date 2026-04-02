@@ -13,6 +13,7 @@ const prisma = require("./config/prisma");
 const authRoutes = require("./modules/auth/auth.routes");
 const financeRoutes = require("./modules/finance/finance.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
+const userRoutes = require("./modules/user/user.routes");
 
 const app = express();
 const PORT = env.PORT;
@@ -28,6 +29,7 @@ app.use(requestLogger);
 app.use("/auth", authRoutes);
 app.use("/records", financeRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/users", userRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).json({

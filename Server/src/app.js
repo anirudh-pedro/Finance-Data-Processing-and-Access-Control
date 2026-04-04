@@ -20,6 +20,9 @@ const { buildSwaggerSpec } = require("./config/swagger");
 const app = express();
 const PORT = env.PORT;
 
+// Required on Render/other reverse proxies so req.protocol reflects https.
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: env.CORS_ORIGIN || true,
@@ -33,7 +36,9 @@ app.use("/records", financeRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/users", userRoutes);
 app.use("/api-docs", swaggerUi.serve, (req, res, next) => {
-  const origin = `${req.protocol}://${req.get("host")}`;
+  const forwardedProto = req.get("x-forwarded-proto");
+  const protocol = forwardedProto ? forwardedProto.split(",")[0].trim() : req.protocol;
+  const origin = `${protocol}://${req.get("host")}`;
   const spec = buildSwaggerSpec(origin);
   return swaggerUi.setup(spec, {
     swaggerOptions: {

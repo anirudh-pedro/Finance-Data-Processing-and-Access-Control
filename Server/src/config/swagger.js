@@ -27,7 +27,12 @@ const swaggerSpec = swaggerJSDoc(options);
 
 function buildSwaggerSpec(currentOrigin) {
   const spec = JSON.parse(JSON.stringify(swaggerSpec));
-  const servers = [];
+  const servers = [
+    {
+      url: "/",
+      description: "Current environment (relative)",
+    },
+  ];
 
   if (currentOrigin) {
     servers.push({

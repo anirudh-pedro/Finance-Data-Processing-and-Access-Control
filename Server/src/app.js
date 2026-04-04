@@ -15,7 +15,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const financeRoutes = require("./modules/finance/finance.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 const userRoutes = require("./modules/user/user.routes");
-const swaggerSpec = require("./config/swagger");
+const { buildSwaggerSpec } = require("./config/swagger");
 
 const app = express();
 const PORT = env.PORT;
@@ -32,7 +32,15 @@ app.use("/auth", authRoutes);
 app.use("/records", financeRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/users", userRoutes);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, (req, res, next) => {
+  const origin = `${req.protocol}://${req.get("host")}`;
+  const spec = buildSwaggerSpec(origin);
+  return swaggerUi.setup(spec, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  })(req, res, next);
+});
 
 app.get("/", (req, res) => {
   return res.status(200).json({

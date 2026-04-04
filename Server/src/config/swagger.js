@@ -9,16 +9,7 @@ const options = {
       description:
         "Role-based backend for managing users, financial records, and analytics using Node.js, Express, Prisma, and PostgreSQL.",
     },
-    servers: [
-      {
-        url: "http://localhost:5000",
-        description: "Local development",
-      },
-      {
-        url: "https://finance-data-processing-and-access-fmor.onrender.com",
-        description: "Production (Render)",
-      },
-    ],
+    servers: [],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -34,4 +25,40 @@ const options = {
 
 const swaggerSpec = swaggerJSDoc(options);
 
-module.exports = swaggerSpec;
+function buildSwaggerSpec(currentOrigin) {
+  const spec = JSON.parse(JSON.stringify(swaggerSpec));
+  const servers = [];
+
+  if (currentOrigin) {
+    servers.push({
+      url: currentOrigin,
+      description: "Current environment",
+    });
+  }
+
+  const defaults = [
+    {
+      url: "http://localhost:5000",
+      description: "Local development",
+    },
+    {
+      url: "https://finance-data-processing-and-access-fmor.onrender.com",
+      description: "Production (Render)",
+    },
+  ];
+
+  for (const server of defaults) {
+    const alreadyExists = servers.some((item) => item.url === server.url);
+    if (!alreadyExists) {
+      servers.push(server);
+    }
+  }
+
+  spec.servers = servers;
+  return spec;
+}
+
+module.exports = {
+  swaggerSpec,
+  buildSwaggerSpec,
+};
